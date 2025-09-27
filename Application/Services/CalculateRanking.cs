@@ -26,23 +26,21 @@ namespace Application.Services
          
         }
 
-        public async Task<List<CalculatedRankingDto>> CalculateRanking(int year)
+        // Cambia el nombre del método para que no coincida con el nombre de la clase
+        public async Task<List<CalculatedRankingDto>> CalculateRankingForYear(int year)
         {
-            
-
             var macroIndicators = await _macroIndicatorService.GetAllAsync();
             var Scores = new Dictionary<int, decimal>();
 
             if (macroIndicators != null)
             {
-
                 foreach (var macro in macroIndicators)
                 {
                     var I = await _countryIndicatorService.GetAllAsync();
 
                     if (I != null)
                     {
-                        var Indicators = I.Where(i => i.MacroIndicatorId == macro.Id);
+                        var Indicators = I.Where(i => i.MacroIndicatorId == macro.Id && i.Year == year).ToList();
 
                         var max = Indicators.Max().Value;
                         var min = Indicators.Min().Value;
@@ -63,13 +61,11 @@ namespace Application.Services
                                 Zscore = (max - ValueActual) / valueRange;
                             }
 
-
                             decimal scoreContribution = Zscore * macro.Weight;
 
                             Scores.TryAdd(countryIndicator.CountryId, 0);
                             Scores[countryIndicator.CountryId] += scoreContribution;
                         }
-
                     }
 
                     var countries = await _countryService.GetAllAsync();
@@ -81,16 +77,45 @@ namespace Application.Services
                         return new List<CalculatedRankingDto>();
                     }
 
-                    double Rmin = rateReturn.MinRate;
-                    double Rmax = rateReturn.MaxRate;
+                    double Rmin = 2;
+                    double Rmax = 15;
+
+                    if (rateReturn.MaxRate != 0)
+                    {
+                        Rmin = rateReturn.MinRate;
+                        Rmax = rateReturn.MaxRate;
+                    }
 
                     double rateRange = Rmax - Rmin;
 
+                    var result = new List<CalculatedRankingDto>();
 
+                    foreach (var score in Scores)
+                    {
+                        var country = countries.FirstOrDefault(c => c.Id == score.Key);
+                        if (country != null)
+                        {
+                            double scoring = (double)score.Value;
+                            double estimatedRate = Rmin + (rateRange * scoring);
+
+                            result.Add(new CalculatedRankingDto
+                            {
+                                CountryId = country.Id,
+                                CountryName = country.Name,
+                                Scoring = scoring,
+                                StimatedRate = estimatedRate
+                            });
+                        }
+                    }
+
+                    return result.OrderByDescending(r => r.Scoring).ToList();
                 }
             }
 
-               
+            return new List<CalculatedRankingDto>();
         }
+
+               
+        
     }
 }
