@@ -5,15 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Entities;
+using System.Reflection;
 
 namespace Persistence.Context
 {
     public class VestAppDbContext : DbContext
     {
-        DbSet<Country> Countries { get; set; }
-        DbSet<MacroIndicator> MacroIndicators { get; set; }
-        DbSet<CountryIndicator> CountryIndicators { get; set; }
-        DbSet<RateReturn> IndicatorValues { get; set; }
+        public DbSet<Country> Countries { get; set; }
+        public DbSet<MacroIndicator> MacroIndicators { get; set; }
+        public DbSet<CountryIndicator> CountryIndicators { get; set; }
+        public DbSet<RateReturn> IndicatorValues { get; set; }
 
         public VestAppDbContext(DbContextOptions<VestAppDbContext> options) : base(options)
         {
@@ -23,6 +24,7 @@ namespace Persistence.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
         
     }

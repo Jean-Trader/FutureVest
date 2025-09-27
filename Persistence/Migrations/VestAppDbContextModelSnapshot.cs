@@ -31,15 +31,17 @@ namespace Persistence.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Countries");
+                    b.ToTable("Countries", (string)null);
                 });
 
             modelBuilder.Entity("Persistence.Entities.CountryIndicator", b =>
@@ -57,11 +59,12 @@ namespace Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(20,4)");
 
                     b.Property<string>("Year")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
 
                     b.HasKey("Id");
 
@@ -69,7 +72,7 @@ namespace Persistence.Migrations
 
                     b.HasIndex("MacroIndicatorId");
 
-                    b.ToTable("CountryIndicators");
+                    b.ToTable("CountryIndicators", (string)null);
                 });
 
             modelBuilder.Entity("Persistence.Entities.MacroIndicator", b =>
@@ -85,14 +88,15 @@ namespace Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
 
                     b.Property<decimal>("Weight")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(20,2)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("MacroIndicators");
+                    b.ToTable("MacroIndicators", (string)null);
                 });
 
             modelBuilder.Entity("Persistence.Entities.RateReturn", b =>
@@ -111,7 +115,7 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("IndicatorValues");
+                    b.ToTable("RateReturns", (string)null);
                 });
 
             modelBuilder.Entity("Persistence.Entities.CountryIndicator", b =>

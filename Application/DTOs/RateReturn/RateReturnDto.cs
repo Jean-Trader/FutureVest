@@ -1,9 +1,9 @@
 ﻿using Persistence.Common;
 
 
-namespace Persistence.Entities
+namespace Application.DTOs.RateReturn
 {
-    public class RateReturn : BasicEntity<int>
+    public class RateReturnDto : BasicEntity<int>
     {
         public required double MinRate { get; set; }
         public required double MaxRate { get; set; }

@@ -16,8 +16,8 @@ namespace Persistence.EntityConfiguration
             builder.ToTable("RateReturns");
             builder.HasKey(e => e.Id);
 
-            builder.Property(e => e.MinRate).IsRequired().HasColumnType("decimal(20,2)");
-            builder.Property(e => e.MaxRate).IsRequired().HasColumnType("decimal(20,2)");
+            builder.Property(e => e.MinRate).IsRequired();
+            builder.Property(e => e.MaxRate).IsRequired();
         }
     }
     
