@@ -26,7 +26,7 @@ namespace Application.Services
          
         }
 
-        public async Task<List<CalculatedRankingDto>> CalculateRanking()
+        public async Task<List<CalculatedRankingDto>> CalculateRanking(int year)
         {
             
 
@@ -39,6 +39,7 @@ namespace Application.Services
                 foreach (var macro in macroIndicators)
                 {
                     var I = await _countryIndicatorService.GetAllAsync();
+
                     if (I != null)
                     {
                         var Indicators = I.Where(i => i.MacroIndicatorId == macro.Id);
@@ -61,6 +62,8 @@ namespace Application.Services
                             {
                                 Zscore = (max - ValueActual) / valueRange;
                             }
+
+
                             decimal scoreContribution = Zscore * macro.Weight;
 
                             Scores.TryAdd(countryIndicator.CountryId, 0);
@@ -68,16 +71,22 @@ namespace Application.Services
                         }
 
                     }
-                    var rateSettings = await _rateReturnService.GetRateReturn();
 
-                    if (rateSettings == null || !macroIndicators.Any() || !allCountryValues.Any())
+                    var countries = await _countryService.GetAllAsync();
+
+                    var rateReturn = await _rateReturnService.GetRateReturn();
+
+                    if (rateReturn == null || !macroIndicators.Any() || !countries.Any())
                     {
-                        return new List<FinalRankingResult>();
+                        return new List<CalculatedRankingDto>();
                     }
 
-                    decimal R_min = rateSettings.MinimumRate;
-                    decimal R_max = rateSettings.MaximumRate;
-                    decimal rateRange = R_max - R_min;
+                    double Rmin = rateReturn.MinRate;
+                    double Rmax = rateReturn.MaxRate;
+
+                    double rateRange = Rmax - Rmin;
+
+
                 }
             }
 
