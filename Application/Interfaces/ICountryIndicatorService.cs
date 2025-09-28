@@ -10,5 +10,6 @@ namespace Application.Interfaces
     public interface ICountryIndicatorService :IDefaultServices<CountryIndicatorDto>, IQueryServices<CountryIndicatorDto>
     { 
         List<CountryIndicatorDto> GetFilter(int countryId, int date);
+        List<CountryIndicatorDto> GetFilterForYear(int date);
     }
 }

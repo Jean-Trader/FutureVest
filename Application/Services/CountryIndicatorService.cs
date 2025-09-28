@@ -257,6 +257,36 @@ namespace Application.Services
 
             }
         }
+        public List<CountryIndicatorDto> GetFilterForYear(int date)
+        {
+            try
+            {
+                
+                var countryIndicators = _repository.GetAllQuery().Include(ci => ci.MacroIndicator)
+                    .Where(ci => ci.Year == date).ToList();
+
+                if (countryIndicators == null || countryIndicators.Count == 0)
+                {
+                    return new List<CountryIndicatorDto>();
+                }
+
+                var listCountryIndicatorDto = countryIndicators.Select(ci => new CountryIndicatorDto
+                {
+                    
+                    Id = ci.Id,
+                    CountryId = ci.CountryId,
+                    MacroIndicatorId = ci.MacroIndicatorId,
+                    Value = ci.Value,
+                    Year = ci.Year,
+                }).ToList();
+
+                return listCountryIndicatorDto;
+            }
+            catch (Exception)
+            {
+                return new List<CountryIndicatorDto>();
+            }
+        }
     }
 }
 

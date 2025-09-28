@@ -1,46 +1,108 @@
-﻿using System;
+﻿using Application.DTOs.Country;
+using Application.DTOs.MacroIndicator;
+using Application.DTOs.Ranking;
+using Application.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Application.Interfaces;
-using Application.DTOs;
-using Application.DTOs.Ranking;
-
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Application.Services
 {
     public class CalculateRanking
-    {    
+    {
         IMacroIndicatorService _macroIndicatorService;
         ICountryIndicatorService _countryIndicatorService;
         ICountryServices _countryService;
         IRateReturnService _rateReturnService;
-        public CalculateRanking(IMacroIndicatorService macroIndicator,ICountryIndicatorService countryIndicator,
-                                ICountryServices country, IRateReturnService rateReturn) 
+        public CalculateRanking(IMacroIndicatorService macroIndicator, ICountryIndicatorService countryIndicator,
+                                ICountryServices country, IRateReturnService rateReturn)
         {
-        
-            _macroIndicatorService = macroIndicator; 
+
+            _macroIndicatorService = macroIndicator;
             _countryIndicatorService = countryIndicator;
             _countryService = country;
             _rateReturnService = rateReturn;
-         
+
         }
 
-        // Cambia el nombre del método para que no coincida con el nombre de la clase
+
+        public async Task<List<CountryDto>> RankingValidationsCountry(int Year)
+        {
+
+            var allCountries = await _countryService.GetAllAsync();
+            var macroIndicators = await _macroIndicatorService.GetAllAsync();
+            var allCountryIndicatorsForYear = _countryIndicatorService.GetFilterForYear(Year);
+
+            int requiredIndicatorCount = macroIndicators.Count;
+
+            if (requiredIndicatorCount == 0 || !allCountryIndicatorsForYear.Any())
+            {
+                return new List<CountryDto>();
+            }
+
+            var validCountriesList = new List<CountryDto>();
+
+
+            foreach (var country in allCountries)
+            {
+                int actualIndicatorCount = 0;
+                bool hasAllIndicators = true;
+
+
+                foreach (var indicator in allCountryIndicatorsForYear)
+                {
+                    if (indicator.CountryId == country.Id)
+                    {
+                        actualIndicatorCount++;
+                    }
+                }
+
+
+                if (actualIndicatorCount == requiredIndicatorCount)
+                {
+
+                    validCountriesList.Add(country);
+                }
+            }
+
+            return validCountriesList;
+        }
+
+
         public async Task<List<CalculatedRankingDto>> CalculateRankingForYear(int year)
         {
+
             var macroIndicators = await _macroIndicatorService.GetAllAsync();
+
+            var validCountries = await RankingValidationsCountry(year);
+
+            var totalWeight = macroIndicators.Sum(m => m.Weight);
+
+            if (totalWeight != 1)
+            {
+                return [];
+            }
+
+            if (!validCountries.Any())
+            {
+                return new List<CalculatedRankingDto>();
+            }
+
             var Scores = new Dictionary<int, decimal>();
 
             if (macroIndicators != null)
             {
+                var I = await _countryIndicatorService.GetAllAsync();
+
                 foreach (var macro in macroIndicators)
                 {
-                    var I = await _countryIndicatorService.GetAllAsync();
-
                     if (I != null)
                     {
                         var Indicators = I.Where(i => i.MacroIndicatorId == macro.Id && i.Year == year).ToList();
+
+                        if (!Indicators.Any()) continue;
 
                         var max = Indicators.Max().Value;
                         var min = Indicators.Min().Value;
@@ -49,10 +111,16 @@ namespace Application.Services
 
                         foreach (var countryIndicator in Indicators)
                         {
+                            if (!validCountries.Any(c => c.Id == countryIndicator.CountryId)) continue;
+
                             decimal Zscore = 0;
                             decimal ValueActual = countryIndicator.Value;
 
-                            if (macro.HighBetter)
+                            if (valueRange == 0)
+                            {
+                                Zscore = 1;
+                            }
+                            else if (macro.HighBetter)
                             {
                                 Zscore = (ValueActual - min) / valueRange;
                             }
@@ -67,55 +135,51 @@ namespace Application.Services
                             Scores[countryIndicator.CountryId] += scoreContribution;
                         }
                     }
-
-                    var countries = await _countryService.GetAllAsync();
-
-                    var rateReturn = await _rateReturnService.GetRateReturn();
-
-                    if (rateReturn == null || !macroIndicators.Any() || !countries.Any())
-                    {
-                        return new List<CalculatedRankingDto>();
-                    }
-
-                    double Rmin = 2;
-                    double Rmax = 15;
-
-                    if (rateReturn.MaxRate != 0)
-                    {
-                        Rmin = rateReturn.MinRate;
-                        Rmax = rateReturn.MaxRate;
-                    }
-
-                    double rateRange = Rmax - Rmin;
-
-                    var result = new List<CalculatedRankingDto>();
-
-                    foreach (var score in Scores)
-                    {
-                        var country = countries.FirstOrDefault(c => c.Id == score.Key);
-                        if (country != null)
-                        {
-                            double scoring = (double)score.Value;
-                            double estimatedRate = Rmin + (rateRange * scoring);
-
-                            result.Add(new CalculatedRankingDto
-                            {
-                                CountryId = country.Id,
-                                CountryName = country.Name,
-                                Scoring = scoring,
-                                StimatedRate = estimatedRate
-                            });
-                        }
-                    }
-
-                    return result.OrderByDescending(r => r.Scoring).ToList();
                 }
             }
 
-            return new List<CalculatedRankingDto>();
-        }
+            var countries = validCountries;
 
-               
-        
+            var rateReturn = await _rateReturnService.GetRateReturn();
+
+            if (rateReturn == null || !countries.Any())
+            {
+                return new List<CalculatedRankingDto>();
+            }
+
+            decimal Rmin = 2;
+            decimal Rmax = 15;
+
+            if (rateReturn.MaxRate != 0)
+            {
+                Rmin = rateReturn.MinRate;
+                Rmax = rateReturn.MaxRate;
+            }
+
+            decimal rateRange = Rmax - Rmin;
+
+            var result = new List<CalculatedRankingDto>();
+
+            foreach (var score in Scores)
+            {
+                var country = countries.FirstOrDefault(c => c.Id == score.Key);
+
+                if (country != null)
+                {
+                    decimal scoring = score.Value;
+                    decimal estimatedRate = Rmin + (rateRange * scoring);
+
+                    result.Add(new CalculatedRankingDto
+                    {
+                        CountryId = country.Id,
+                        CountryName = country.Name,
+                        Scoring = (double)scoring,
+                        StimatedRate = (double)estimatedRate
+                    });
+                }
+            }
+
+            return result.OrderByDescending(r => r.Scoring).ToList();
+        }
     }
 }
