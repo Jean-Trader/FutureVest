@@ -1,0 +1,72 @@
+﻿@using Application.ViewModels.CountryIndicators
+@model CountryIndicatorVM
+@{
+    bool editMode = ViewBag.EditMode ?? false;
+
+    if (editMode == false)
+    {
+        ViewData["Title"] = "Agregar Indicador";
+    }
+    else ViewData["Title"] = "Editar Indicador";
+
+}
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @ViewBag.ErrorMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+
+<div class="col-14 col-md-4 offset-md-3 ">
+    <div class="card">
+        <div class="card-header bg-success text-bg-light"><h4 class="text-center">@(editMode ? "Editar Indicador: " : "Agregar nuevo Indicador")</h4></div>
+        <div class="card-body">
+            <form asp-controller="Indicator" asp-action="@(editMode ? "Edit" : "Create")" method="POST" class="align-content-center">
+                <input type="hidden" asp-for="Id" />
+                <div class="mb-3">
+                    <label asp-for="CountryId" class="form-label">Países:</label>
+                    <select asp-for="CountryId" class="form-select">
+                        <option value="0">Seleccionar</option>
+                        @if (ViewBag.Countries != null)
+                            foreach (var Countries in ViewBag.Countries)
+                            {
+                                <option value="@Countries.Id">@Countries.Name</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="CountryId" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="MacroIndicatorId" class="form-label">Macro Indicadores:</label>
+                    <select asp-for="MacroIndicatorId" class="form-select">
+                        <option value="0">Seleccionar</option>
+                        @if (ViewBag.MacroIndicators != null)
+                            foreach (var MacroIndicators in ViewBag.MacroIndicators)
+                            {
+                                <option value="@MacroIndicators.Id">@MacroIndicators.Name</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="MacroIndicatorId" class="text-danger"></span>
+                    </div>
+                <div class="mb-3">
+                    <label asp-for="Year" class="form-label">Año:</label>
+                    <input class="form-control" asp-for="Year" />
+                    <span asp-validation-for="Year" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Value" class="form-label">Valor:</label>
+                    <input class="form-control" asp-for="Value" />
+                    <span asp-validation-for="Value" class="text-danger"></span>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-outline-dark float-end">guardar</button>
+                    <a asp-controller="Indicator" asp-action="Index" class="btn btn-outline-dark float-end me-2">Volver</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+﻿@using Application.ViewModels.CountryIndicators
+@model List<ViewCountryIndicatorVM>;
+@{
+    ViewData["Title"] = "Indicators";
+}
+
+<div class="row">
+    <div class="text-center">
+        <h1 class="display-4">Indicadores</h1>
+    </div>
+</div>
+
+<div class="row-mb-4">
+    <div class="col-10 col-md-4">
+        <a class="btn btn-outline-success" asp-controller="Indicator" asp-action="Create">Añadir indicador</a>
+    </div>
+</div>
+
+<div class="container border rounded p-4" style="margin-top: 20px;">
+    <div class="row mt-2">
+        @if (Model.Count == 0)
+        {
+            <div class="text-md-center">
+                <h5>Añade algún indicador a la lista</h5>
+            </div>
+        }
+        else
+        {
+            @foreach (var CMV in Model)
+            {
+                <div class="col-11 col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">País: @CMV.CountryName</h6>
+                            <h8 class="card-subtitle">Macro Indicador: @CMV.MacroIndicatorName</h8>
+                            <h9 class="card-text">Valor: @CMV.Value</h9>
+                            <h9 class="card-text">Año: @CMV.Year</h9>
+                            <div class="mt-2">
+                                <a class="btn btn-outline-warning btn-sm " asp-controller="Indicator" asp-action="Edit" asp-route-id="@CMV.Id">Editar</a>
+                                <a class="btn btn-outline-danger btn-sm" asp-controller="Indicator" asp-action="Delete" asp-route-id="@CMV.Id">Eliminar</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            }
+        }
+    </div>
+</div>

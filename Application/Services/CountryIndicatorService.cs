@@ -4,6 +4,7 @@ using Application.DTOs.CountryIndicator;
 using Application.DTOs.MacroIndicator;
 using Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Entities;
 using Persistence.Interfaces;
 using Persistence.Repositories;
@@ -21,9 +22,9 @@ namespace Application.Services
     {
         private ICommonRepo<CountryIndicator> _repository;
 
-        public CountryIndicatorService(ICommonRepo<CountryIndicator> repo)
+        public CountryIndicatorService(VestAppDbContext context)
         {
-            _repository = repo;
+            _repository = new CountryIndicatorRepo(context);
         }
 
         public async Task<List<CountryIndicatorDto>> GetAllAsync()
