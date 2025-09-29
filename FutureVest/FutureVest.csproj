@@ -27,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\MacroIndicators\" />
     <Folder Include="Views\Indicators\" />
     <Folder Include="Views\RateOfReturn\" />
   </ItemGroup>

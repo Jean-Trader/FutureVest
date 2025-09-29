@@ -122,16 +122,14 @@ namespace FutureVest.Controllers
             return View(Del);
         }
         [HttpPost]
-        public IActionResult Delete(DeleteCountryVM del) 
+        public async Task<IActionResult> Delete(DeleteCountryVM del) 
         { 
             if (!ModelState.IsValid)
             {
                 return View(del);
             }
 
-            _countriesService.DeleteAsync(del.Id);
-
-            ViewBag.Sucess = "País eliminado correctamente";
+            await _countriesService.DeleteAsync(del.Id);
 
             return RedirectToRoute(new { controller = "Countries", action = "Index" });
         }

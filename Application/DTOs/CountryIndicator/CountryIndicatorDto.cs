@@ -4,7 +4,7 @@ using Application.DTOs.MacroIndicator;
 
 namespace Application.DTOs.CountryIndicator
 {
-    public class CountryIndicatorDto : BasicEntityDto<int>
+    public class CountryIndicatorDto: BasicEntityDto<int>
     {
         public required int CountryId { get; set; }
         public required int MacroIndicatorId { get; set; }
