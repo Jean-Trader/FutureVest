@@ -15,7 +15,7 @@ namespace FutureVest.Controllers
             _macroIndicatorService = new MacroIndicatorServices(context);
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult>Index()
         {
             var countries = await _macroIndicatorService.GetAllAsync();
 
@@ -39,10 +39,18 @@ namespace FutureVest.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(MacroIndicatorVM M)
         {
+            var Indicators = await _macroIndicatorService.GetAllAsync();
+            var weightSum = Indicators.Sum(i => i.Weight);
 
+            if (weightSum + M.Weight > 1)
+            {
+                ViewBag.ErrorMessage = "Error al crear Macro Indicador, el peso total no debe ser mayor que 1";
+                return View("Save", M);
+
+            }
             if (!ModelState.IsValid)
             {
-                ViewBag.ErrorMessage = "Error al crear país";
+                ViewBag.ErrorMessage = "Error al crear Macro Indicador";
                 return View("Save", M);
             }
 
@@ -79,10 +87,7 @@ namespace FutureVest.Controllers
             };
 
             return View("Save", MVM);
-
-
         }
-
         [HttpPost]
         public async Task<IActionResult> Edit(MacroIndicatorVM MVM)
         {
@@ -105,7 +110,7 @@ namespace FutureVest.Controllers
             };
 
             await _macroIndicatorService.UpdateAsync(C, MVM.Id);
-            return RedirectToRoute(new { Controller = "MacroIndicators", action = "Index" });
+            return RedirectToRoute(new { Controller = "MacroIndicator", action = "Index" });
 
         }
 
@@ -115,7 +120,7 @@ namespace FutureVest.Controllers
 
             if (C == null)
             {
-                ViewBag.ErrorMessage = "No se encontró el país";
+                ViewBag.ErrorMessage = "No se encontró el Macro Indicador";
                 return RedirectToRoute(new { Controller = "MacroIndicator", action = "Index" });
             }
             DeleteMacroIndicatorVM Del = new DeleteMacroIndicatorVM
@@ -129,6 +134,8 @@ namespace FutureVest.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(DeleteMacroIndicatorVM del)
         {
+            
+
             if (!ModelState.IsValid)
             {
                 return View(del);

@@ -1,0 +1,24 @@
+﻿@using Application.ViewModels.MacroIndicators
+@model DeleteMacroIndicatorVM
+@{
+    ViewData["Title"] = "Borrar macro indicador";
+}
+
+<div class="col-12 col-md-9 offset-md-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h4 class="text-center">
+                Estás seguro de que deseas eliminar el país: @Model.Name?
+            </h4>
+        </div>
+        <div class="card-body">
+            <form asp-controller="MacroIndicator" asp-action="Delete" method="POST">
+                <input type="hidden" asp-for="Id" />
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-danger me-2">Delete</button>
+                    <a asp-controller="MacroIndicator" asp-action="Index" class="btn btn-outline-warning">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
