@@ -1,0 +1,48 @@
+﻿@using Application.ViewModels.Country
+@model CountryViewModel
+@{
+
+    bool editMode = ViewBag.EditMode ?? false;
+
+    if (editMode == false)
+    {
+        ViewData["Title"] = "Agregar activo";
+    }
+    else ViewData["Title"] = "Editar activo";
+
+}
+    
+@if (ViewBag.ErrorMessage != null)
+{
+ <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    @ViewBag.ErrorMessage
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+ </div>
+}
+
+
+<div class="col-14 col-md-4 offset-md-3 ">
+    <div class="card">
+        <div class="card-header bg-success text-bg-light"><h4 class="text-center">@(editMode ? "Editar país: " + Model.Name : "Agregar nuevo país")</h4></div>
+        <div class="card-body">
+            <form asp-controller="Countries" asp-action="@(editMode ? "Edit" : "Create")" method="POST" class="align-content-center">
+                <input type="hidden" asp-for="Id"/>
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">Nombre:</label>
+                    <input class="form-control" asp-for="Name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Code" class="form-label">Código del país:</label>
+                    <textarea class="form-control" asp-for="Code"></textarea>
+                    <span asp-validation-for="Code" class="text-danger"></span>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-outline-dark float-end">guardar</button>
+                    <a asp-controller="Countries" asp-action="Index" class="btn btn-outline-dark float-end me-2">Volver</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

@@ -1,5 +1,10 @@
+using Application.Interfaces;
+using Application.Services;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Context;
+using Persistence.Interfaces;
+using Persistence.Repositories;
+using Persistence.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +12,15 @@ var builder = WebApplication.CreateBuilder(args);
 var ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<VestAppDbContext>(options =>
     options.UseSqlServer(ConnectionString));
+
+builder.Services.AddScoped<ICountryServices, CountryServices>();
+builder.Services.AddScoped<ICountryIndicatorService, CountryIndicatorService>();
+builder.Services.AddScoped<IMacroIndicatorService, MacroIndicatorServices>();
+builder.Services.AddScoped<IRateReturnService,RateReturnService>();
+builder.Services.AddScoped<ICommonRepo<CountryIndicator>, CountryIndicatorRepo>();
+builder.Services.AddScoped<IRateReturnRepo, RateReturnRepo>();
+builder.Services.AddScoped<ICommonRepo<Country>,CountryRepo>();
+builder.Services.AddScoped<ICommonRepo<MacroIndicator>, MacroIndicatorRepo>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
