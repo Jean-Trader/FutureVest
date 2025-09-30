@@ -17,9 +17,11 @@ namespace Application.ViewModels.CountryIndicators
         [Required(ErrorMessage = "Macro Indicator Required")]
         public required int MacroIndicatorId { get; set; }
         [Required(ErrorMessage = "Year Required")]
+        [Range(1900, 2100, ErrorMessage = "El año debe ser válido")]
         public required int Year { get; set; }
         [Required(ErrorMessage = "Value Required")]
-        public required decimal Value { get; set; }
+        [Range(1, 100000000000, ErrorMessage = "Year required")]
+        public decimal Value { get; set; }
         public CountryViewModel? Country { get; set; }
         public MacroIndicatorDto? MacroIndicator { get; set; }
 

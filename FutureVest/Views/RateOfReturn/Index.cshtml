@@ -1,0 +1,50 @@
+﻿
+@using Application.ViewModels.RateOfReturns
+@model RateReturnVM
+@{
+        ViewData["Title"] = "Ajustar tasa de retorno";
+    
+}
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @ViewBag.ErrorMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+    
+<div class="col-14 col-md-4 offset-md-3 ">
+    <div class="card">
+        <div class="card-header bg-success text-bg-light"><h4 class="text-center">"Establecer la tasa de retorno"</h4></div>
+        <div class="card-body">
+            <form asp-controller="RateOfReturn" asp-action="Index" method="POST" class="align-content-center">
+                <input type="hidden" asp-for="Id"/>
+                <div class="mb-3">
+                    <label asp-for="MaxRate" class="form-label">Tasa máxima</label>
+                    <input class="form-control" asp-for="MaxRate" />
+                    <span asp-validation-for="MaxRate" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="MinRate" class="form-label">Tasa mínima:</label>
+                    <input class="form-control" asp-for="MinRate"> 
+                    <span asp-validation-for="MinRate" class="text-danger"></span>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-outline-dark float-end me-2">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="col-14 col-md-4 offset-md-3">
+@if(Model.MinRate != 0 && Model.MaxRate != 0)
+{
+    <h6>Tasa máxima actual: @Model.MaxRate</h6>
+    <h6>Tasa mínima actual: @Model.MinRate</h6>
+}else
+{
+    <h6>Tasa máxima actual: 15</h6>
+    <h6>Tasa mínima actual: 5</h6>
+}
+</div>

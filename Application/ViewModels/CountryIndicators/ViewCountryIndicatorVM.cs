@@ -12,12 +12,12 @@ namespace Application.ViewModels.CountryIndicators
 {
     public class ViewCountryIndicatorVM : CommonModel<int>
     {
-        public required int CountryId { get; set; }
-        public required int MacroIndicatorId { get; set; }
-        public required string CountryName { get; set; } 
-        public required string MacroIndicatorName { get; set; }
-        public required int Year { get; set; }
-        public required decimal Value { get; set; }
+        public int CountryId { get; set; }
+        public int MacroIndicatorId { get; set; }
+        public string CountryName { get; set; } 
+        public string MacroIndicatorName { get; set; }
+        public int Year { get; set; }
+        public decimal Value { get; set; }
      
 
     }

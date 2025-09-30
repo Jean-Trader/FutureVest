@@ -47,11 +47,14 @@ namespace Application.Services
             }
         }
 
-        public async Task<RateReturnDto> GetRateReturn() 
-        { 
-        
-         var Rate = await _rateReturnRepo.GetTheAsync();
+        public async Task<RateReturnDto?> GetRateReturn() 
+        {
 
+            var Rate = await _rateReturnRepo.GetTheAsync();
+            if (Rate == null)
+            {
+                return null;
+            }
             RateReturnDto rateReturn = new RateReturnDto
             {
                 Id = Rate.Id,

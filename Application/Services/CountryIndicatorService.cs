@@ -88,14 +88,7 @@ namespace Application.Services
             {
                 if (countryDto != null)
                 {
-                    var indicators = _repository.GetAllQuery();
-
-                    var exists = indicators.Any(i => i.MacroIndicatorId == countryDto.MacroIndicatorId && i.Year == countryDto.Year);
-
-                    if (exists)
-                    {
-                        return false;
-                    }
+                    
 
                     CountryIndicator country = new CountryIndicator
                     {
@@ -206,9 +199,11 @@ namespace Application.Services
 
                 return [];
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return [];
+                Console.WriteLine($"Error {ex.Message}");
+                throw;
+                
             }
         }
         public List<CountryIndicatorDto> GetFilter(int countryId, int date)

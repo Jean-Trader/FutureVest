@@ -57,23 +57,23 @@ namespace FutureVest.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CountryIndicatorVM vm)
         {
-            var Co = await _countryService.GetAllAsync();
-            var Ma = await _macroIndicatorService.GetAllAsync();
-
-            var countries = Co.Select(C => new AddCountryModel { Id = C.Id, Name = C.Name }).ToList();
-            var macroI = Ma.Select(m => new AddMacroIndicatorVM { Id = m.Id, Name = m.Name }).ToList();
-
-            if (!ModelState.IsValid || vm == null )
+            if (!ModelState.IsValid)
             {
-                ViewBag.ErrorMessage = "Error al crear indicador";
-
+                ViewBag.ErrorMessage = "Complete todos los campos requeridos";
+                ViewBag.Countries = await _countryService.GetAllAsync();
+                ViewBag.MacroIndicators = await _macroIndicatorService.GetAllAsync();
                 return View("Save", vm);
             }
-            ViewBag.Countries = countries;
-            ViewBag.macroIndicators = macroI;
 
-            var country = await _countryService.GetByIdAsync(vm.CountryId);
-            var macroIndicator = await _macroIndicatorService.GetByIdAsync(vm.MacroIndicatorId);
+            var indicators = _indicatorService.GetAllQuery();
+            var exists = indicators.Any(i => i.MacroIndicatorId == vm.MacroIndicatorId && i.Year == vm.Year && i.CountryId == vm.CountryId);
+            if (exists)
+            {
+                ViewBag.ErrorMessage = "Ya existe el indicador para ese país y año";
+                ViewBag.Countries = await _countryService.GetAllAsync();
+                ViewBag.MacroIndicators = await _macroIndicatorService.GetAllAsync();
+                return View("Save", vm);
+            }
 
             CountryIndicatorDto dto = new CountryIndicatorDto()
             {
@@ -82,8 +82,6 @@ namespace FutureVest.Controllers
                 MacroIndicatorId = vm.MacroIndicatorId,
                 Year = vm.Year,
                 Value = vm.Value,
-                Country = country,
-                MacroIndicator = macroIndicator
             };
 
             await _indicatorService.CreateAsync(dto);
