@@ -4,17 +4,20 @@
     ViewData["Title"] = "Macro Indicators";
 }
 
+
 <div class="row">
     <div class="text-center">
         <h1 class="display-4">Macro Indicadores</h1>
     </div>
 </div>
 
-<div class="row-mb-4">
-    <div class="col-10 col-md-4">
-        <a class="btn btn-outline-success" asp-controller="MacroIndicator" asp-action="Create">Añadir macro indicador</a>
+
+    <div class="row-mb-4">
+        <div class="col-10 col-md-4">
+            <a class="btn btn-outline-success" asp-controller="MacroIndicator" asp-action="Create">Añadir macro indicador</a>
+        </div>
     </div>
-</div>
+
 
 <div class="container border rounded p-4" style="margin-top: 20px;">
     <div class="row mt-2">
@@ -33,7 +36,7 @@
                 <div class="col-11 col-md-3">
                     <div class="card">
                         <div class="card-body">
-                            <h6 class="card-title">Macro indicador: @CMV.Name</h6>
+                            <h7 class="card-title">Macro indicador: @CMV.Name</h7>
                             <h8 class="card-subtitle">Peso: @CMV.Weight </h8>
                             <div class="mt-2">
                                 <a class="btn btn-outline-warning btn-sm " asp-controller="MacroIndicator" asp-action="Edit" asp-route-id="@CMV.Id">Editar</a>

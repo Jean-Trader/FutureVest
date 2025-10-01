@@ -15,6 +15,9 @@
         <a class="btn btn-outline-success" asp-controller="Indicator" asp-action="Create">Añadir indicador</a>
     </div>
 </div>
+@{
+    var list = Model;
+}
 
 <div class="container border rounded p-4" style="margin-top: 20px;">
     <div class="row mt-2">
@@ -26,15 +29,15 @@
         }
         else
         {
-            @foreach (var CMV in Model)
+            @foreach (var CMV in list)
             {
-                <div class="col-11 col-md-3">
+                <div class="col-11 col-md-4">
                     <div class="card">
                         <div class="card-body">
-                            <h6 class="card-title">País: @CMV.CountryName</h6>
-                            <h8 class="card-subtitle">Macro Indicador: @CMV.MacroIndicatorName</h8>
-                            <h9 class="card-text">Valor: @CMV.Value</h9>
-                            <h9 class="card-text">Año: @CMV.Year</h9>
+                            <h7 class="card-title">País:  @CMV.CountryName</h7>
+                            <p class="card-subtitle">Macro Indicador:  @CMV.MacroIndicatorName</p>
+                            <p class="card-text">Valor:  @(Convert.ToDouble(CMV.Value))</p>
+                            <p class="card-text">Año:  @CMV.Year</p>
                             <div class="mt-2">
                                 <a class="btn btn-outline-warning btn-sm " asp-controller="Indicator" asp-action="Edit" asp-route-id="@CMV.Id">Editar</a>
                                 <a class="btn btn-outline-danger btn-sm" asp-controller="Indicator" asp-action="Delete" asp-route-id="@CMV.Id">Eliminar</a>
@@ -46,4 +49,31 @@
             }
         }
     </div>
+</div>
+<div class="row-mb-2">
+    <form asp-controller="Indicator" asp-action="Index" method="get">
+        <select name="countryId" class="form-select">
+            <option value="">Todos los países</option>
+            @foreach (var country in Model
+                        .Select(x => new { x.CountryId, x.CountryName })
+                        .Distinct()
+                        .OrderBy(c => c.CountryName))
+            {
+                <option value="@country.CountryId"
+                        selected="@(country.CountryId == ViewBag.SelectedCountry)">
+                    @country.CountryName
+                </option>
+            }
+        </select>
+
+        <select name="year" class="form-select">
+            <option value="">Todos los años</option>
+            @for (int y = DateTime.Now.Year; y >= 1900; y--)
+            {
+                <option value="@y" selected="@(y == ViewBag.SelectedYear)">@y</option>
+            }
+        </select>
+
+        <button type="submit">Filtrar</button>
+    </form>
 </div>

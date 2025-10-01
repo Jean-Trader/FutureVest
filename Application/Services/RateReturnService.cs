@@ -33,7 +33,7 @@ namespace Application.Services
                 {
                     var newRateReturn = new RateReturn
                     {
-                        Id = 1,
+                        Id = 0,
                         MinRate = rateReturn.MinRate,
                         MaxRate = rateReturn.MaxRate
                     };

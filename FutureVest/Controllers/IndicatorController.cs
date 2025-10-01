@@ -21,9 +21,30 @@ namespace FutureVest.Controllers
             _macroIndicatorService = new MacroIndicatorServices(context);
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? countryId, int? year)
         {
+            if(countryId != null && year != null) 
+            { 
+             var indicatorsFilter = _indicatorService.GetFilter((int)countryId, (int)year);
+
+                var listIndicatorsFilters = indicatorsFilter.Select(i => new ViewCountryIndicatorVM
+                {
+                    Id = i.Id,
+                    CountryId = i.CountryId,
+                    MacroIndicatorId = i.MacroIndicatorId,
+                    CountryName = i.Country.Name,
+                    MacroIndicatorName = i.MacroIndicator.Name,
+                    Year = i.Year,
+                    Value = i.Value
+
+                }).ToList();
+                ViewBag.SelectedYear = year;
+                return View(listIndicatorsFilters);
+                
+            }
+
             var indicators = _indicatorService.GetAllQuery();
+
 
             var listIndicators = indicators.Select(i => new ViewCountryIndicatorVM
             {
@@ -36,7 +57,7 @@ namespace FutureVest.Controllers
                 Value = i.Value
 
             }).ToList();
-
+            ViewBag.SelectedYear = year;
             return View(listIndicators);
         }
 

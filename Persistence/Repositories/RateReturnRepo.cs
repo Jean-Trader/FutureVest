@@ -14,34 +14,23 @@ namespace Persistence.Repositories
         }
         public async Task<bool> NewAsync(RateReturn newRate)
         {
-            var rateReturn = await _Context.Set<RateReturn>().FirstAsync();
+            if (newRate == null)
+                throw new ArgumentNullException(nameof(newRate));
 
-            if (rateReturn != null)
+            var existingRate = await _Context.Set<RateReturn>().FirstOrDefaultAsync();
+
+            if (existingRate != null)
             {
-                if (newRate != null)
-                {
-                    _Context.Entry(rateReturn).CurrentValues.SetValues(newRate);
-                    await _Context.SaveChangesAsync();
-                    return true;
-                }
-                else
-                {
-                    throw new ArgumentNullException(nameof(newRate), "The newRate parameter cannot be null.");
-                }
+                existingRate.MinRate = newRate.MinRate;
+                existingRate.MaxRate = newRate.MaxRate;
             }
             else
             {
-                if (newRate == null)
-                {
-                    throw new ArgumentNullException(nameof(newRate), "The newRate parameter cannot be null.");
-                }
-                else
-                {
-                    await _Context.Set<RateReturn>().AddAsync(newRate);
-                    await _Context.SaveChangesAsync();
-                    return true;
-                }
+                await _Context.Set<RateReturn>().AddAsync(newRate);
             }
+
+            await _Context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<RateReturn?> GetTheAsync()

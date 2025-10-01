@@ -1,16 +1,12 @@
 ﻿using Application.DTOs.Country;
-using Application.DTOs.MacroIndicator;
 using Application.DTOs.Ranking;
 using Application.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
+
 namespace Application.Services
 {
-    public class CalculateRanking
+    public class CalculateRanking : IRanking
     {
         IMacroIndicatorService _macroIndicatorService;
         ICountryIndicatorService _countryIndicatorService;
@@ -26,8 +22,6 @@ namespace Application.Services
             _rateReturnService = rateReturn;
 
         }
-
-
         public async Task<List<CountryDto>> RankingValidationsCountry(int Year)
         {
 
@@ -58,7 +52,6 @@ namespace Application.Services
                         actualIndicatorCount++;
                     }
                 }
-
 
                 if (actualIndicatorCount == requiredIndicatorCount)
                 {
@@ -104,8 +97,8 @@ namespace Application.Services
 
                         if (!Indicators.Any()) continue;
 
-                        var max = Indicators.Max().Value;
-                        var min = Indicators.Min().Value;
+                        var max = Indicators.Max(I => I.Value);
+                        var min = Indicators.Min(I => I.Value);
 
                         decimal valueRange = max - min;
 
@@ -116,17 +109,24 @@ namespace Application.Services
                             decimal Zscore = 0;
                             decimal ValueActual = countryIndicator.Value;
 
-                            if (valueRange == 0)
+                            if (valueRange == 0m)
                             {
-                                Zscore = 1;
+                                Zscore = 0.5m; 
                             }
-                            else if (macro.HighBetter)
+                            else if (ValueActual == min)
                             {
-                                Zscore = (ValueActual - min) / valueRange;
+                                Zscore = 0m;
+                            }
+                            else if (ValueActual == max)
+                            {
+                                Zscore = 1m;
                             }
                             else
                             {
-                                Zscore = (max - ValueActual) / valueRange;
+                                if (macro.HighBetter)
+                                    Zscore = (ValueActual - min) / valueRange;
+                                else
+                                   Zscore = (max - ValueActual) / valueRange;
                             }
 
                             decimal scoreContribution = Zscore * macro.Weight;
@@ -142,15 +142,14 @@ namespace Application.Services
 
             var rateReturn = await _rateReturnService.GetRateReturn();
 
+            decimal Rmin = 0;
+            decimal Rmax = 0;
+
             if (rateReturn == null || !countries.Any())
             {
-                return new List<CalculatedRankingDto>();
-            }
-
-            decimal Rmin = 2;
-            decimal Rmax = 15;
-
-            if (rateReturn.MaxRate != 0)
+                Rmin = 2;
+                Rmax = 15;
+            } else if (rateReturn.MaxRate != 0)
             {
                 Rmin = rateReturn.MinRate;
                 Rmax = rateReturn.MaxRate;
@@ -173,6 +172,7 @@ namespace Application.Services
                     {
                         CountryId = country.Id,
                         CountryName = country.Name,
+                        Code = country.Code,
                         Scoring = (double)scoring,
                         StimatedRate = (double)estimatedRate
                     });

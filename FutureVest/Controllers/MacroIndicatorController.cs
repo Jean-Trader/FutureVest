@@ -31,8 +31,16 @@ namespace FutureVest.Controllers
             return View(ListCountries);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var macroIndicators = await _macroIndicatorService.GetAllAsync();
+            var weightSum = macroIndicators.Sum(i => i.Weight);
+
+            if (weightSum == 1)
+            {
+                ViewBag.CanCreate = weightSum;
+            }
+
             return View("Save", new MacroIndicatorVM { Name = "", Weight = 0m, HighBetter = false });
         }
 
